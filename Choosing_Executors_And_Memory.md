@@ -26,7 +26,7 @@ Problems:
 
 3. Correct Approach
 Since we have total of 96 cores:
-Set aside 1 core on each machine for OS processes. 96 -6 = 90
+Set aside 1 core on each machine for OS processes(hadoop/Yarn daemon cores). 96 -6 = 90
 So that leaves us with 90 cores
 So 90/6 = 15 cores per machine is left for our spark jobs
 Now the optimal number of executors per core recommended is 5 cores per executor to ensure there is not too much of IO contention.
@@ -36,7 +36,12 @@ So total of 6*3 = 18 executors with 5 cores per executor is possible
 Memory required for executor:
 1. Per machine we have 64 GB RAM but 1 GB we need to set aside for OS processes. So we have 63 GB per machine.
 2. 63 GB / 3 = 21 GB per executor
-3. Yarn overhead is 2 GB for every executor( approximately 7% of memory per executor)
+3. Yarn overhead is 2 GB for every executor( default is max of (384MB, approximately 7% of memory per executor) whichever is the biggest between the two)
+This yarn overhead is for off heap memory(things like direct buffers)
 4. So ideally 19 GB per executor is available
 
 So in the end we have total of 18 executors(5 cores per executor) with each executor having 19 GB memory.
+
+So one executor will be for spark driver.
+
+Refer article: https://blog.cloudera.com/how-to-tune-your-apache-spark-jobs-part-2/
